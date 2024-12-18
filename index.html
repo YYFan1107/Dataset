@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>CSV Data</title>
+</head>
+<body>
+    <div>
+        <canvas id="tempChart"></canvas>
+    </div>
+
+    <script>
+    async function getData() {
+        const response = await fetch("ZoAnn.csv");
+        const data = await response.text();
+        const rows = data.split("\n").slice(1);
+        const labels = [];
+        const values = [];
+        
+        rows.forEach((elem) => {
+            const row = elem.split(",");
+            const year = row[0];
+            const temp = parseFloat(row[1]) + 14;
+
+            labels.push(year);
+            values.push(temp);
+
+            console.log(year, temp);
+        });
+
+        return {labels, values};
+    }
+
+    async function createChart() {
+        const {labels, values} = await getData();
+        const ctx = document.getElementById('tempChart')
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Global Average Temperature',
+                    data: values,
+                    borderWidth: 1,
+                    borderColor: 'red',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Global Temperature (1880-2022)',
+                        font: {
+                            size: 30
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                    }
+                }
+            }
+        })
+    }
+
+    createChart();
+    </script>
+</body>
+</html>
